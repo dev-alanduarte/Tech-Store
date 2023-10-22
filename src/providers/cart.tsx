@@ -4,6 +4,7 @@ import { ProductWithTotalPrice } from "@/helpers/product";
 import { ReactNode, createContext, useEffect, useMemo, useState } from "react";
 
 export interface CartProduct extends ProductWithTotalPrice {
+  [x: string]: any;
   quantity: number;
 }
 
