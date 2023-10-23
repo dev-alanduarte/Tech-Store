@@ -37,12 +37,18 @@ export const CartContext = createContext<ICartContext>({
 });
 
 const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [products, setProducts] = useState<CartProduct[]>(
-    JSON.parse(localStorage.getItem("@fsw-store/cart-products") || "[]"),
-  );
+  // Check if localStorage is available before using it
+  const initialProducts = typeof localStorage !== "undefined"
+    ? JSON.parse(localStorage.getItem("@fsw-store/cart-products") || "[]")
+    : [];
+
+  const [products, setProducts] = useState<CartProduct[]>(initialProducts);
 
   useEffect(() => {
-    localStorage.setItem("@fsw-store/cart-products", JSON.stringify(products));
+    // Check if localStorage is available before using it
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem("@fsw-store/cart-products", JSON.stringify(products));
+    }
   }, [products]);
 
   // Total sem descontos
@@ -62,9 +68,9 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
   const totalDiscount = subtotal - total;
 
   const addProductToCart = (product: CartProduct) => {
-    // se o produto já estiver no carrinho, apenas aumente a sua quantidade
+    // If the product is already in the cart, increase its quantity
     const productIsAlreadyOnCart = products.some(
-      (cartProduct) => cartProduct.id === product.id,
+      (cartProduct) => cartProduct.id === product.id
     );
 
     if (productIsAlreadyOnCart) {
@@ -78,13 +84,13 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
           }
 
           return cartProduct;
-        }),
+        })
       );
 
       return;
     }
 
-    // se não, adicione o produto à lista
+    // Otherwise, add the product to the list
     setProducts((prev) => [...prev, product]);
   };
 
@@ -101,7 +107,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
 
           return cartProduct;
         })
-        .filter((cartProduct) => cartProduct.quantity > 0),
+        .filter((cartProduct) => cartProduct.quantity > 0)
     );
   };
 
@@ -116,13 +122,13 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
         }
 
         return cartProduct;
-      }),
+      })
     );
   };
 
   const removeProductFromCart = (productId: string) => {
     setProducts((prev) =>
-      prev.filter((cartProduct) => cartProduct.id !== productId),
+      prev.filter((cartProduct) => cartProduct.id !== productId)
     );
   };
 
